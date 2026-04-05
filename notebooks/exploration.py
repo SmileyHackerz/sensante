@@ -34,12 +34,18 @@ region_counts = df["region"].value_counts().head(5)
 for region, count in region_counts.items():
     print(f" {region:15s} : {count:3d} patients")
 
+# ===== ANALYSE PAR SEXE ET DIAGNOSTIC (EXERCICE 1) =====
+print(f"\n--- Nombre de patients par sexe et diagnostic ---")
+# Utilisation de groupby pour compter les patients par sexe et par pathologie
+analyse_sexe_diag = df.groupby(["sexe", "diagnostic"]).size()
+print(analyse_sexe_diag)
+
 # ===== TEMPERATURE MOYENNE PAR DIAGNOSTIC =====
 print(f"\n--- Temperature moyenne par diagnostic---")
 temp_by_diag = df.groupby("diagnostic")["temperature"].mean()
 for diag, temp in temp_by_diag.items():
     print(f" {diag:12s} : {temp:.1f} C")
-    
+
 print(f"\n{'=' * 50}")
 print("Exploration terminee !")
 print("Prochain lab : entrainer un modele ML")
