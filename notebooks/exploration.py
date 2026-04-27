@@ -50,3 +50,17 @@ print(f"\n{'=' * 50}")
 print("Exploration terminee !")
 print("Prochain lab : entrainer un modele ML")
 print(f"{'=' * 50}")
+
+from sklearn.model_selection import train_test_split
+# 80% pour l'entrainement, 20% pour le test
+X_train, X_test, y_train, y_test = train_test_split(
+X, y,
+test_size=0.2,
+# 20% pour le test
+random_state=42,
+# Pour avoir les memes resultats a chaque fois
+stratify=y
+# Garder les memes proportions de diagnostics
+)
+print(f"Entrainement : {X_train.shape[0]} patients")
+print(f"Test : {X_test.shape[0]} patients")
