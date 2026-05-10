@@ -129,3 +129,60 @@ print(f"\nProbabilites par classe :")
 for classe, proba in zip(model_loaded.classes_, probas):
     bar = '#' * int(proba * 30)
     print(f" {classe:8s} : {proba:.1%} {bar}")
+importances = model.feature_importances_
+for name, imp in sorted(zip(feature_cols, importances),
+    key=lambda x: x[1], reverse=True): print(f" {name:20s} : {imp:.3f}")
+
+def predire_diagnostic(patient):
+    sexe_enc = le_sexe_loaded.transform([patient['sexe']])[0]
+    region_enc = le_region_loaded.transform([patient['region']])[0]
+
+    # Utiliser un DataFrame pour éviter le UserWarning
+    import pandas as pd
+    features_dict = {
+        'age': [patient['age']],
+        'sexe_encoded': [sexe_enc],
+        'temperature': [patient['temperature']],
+        'tension_sys': [patient['tension_sys']],
+        'toux': [int(patient['toux'])],
+        'fatigue': [int(patient['fatigue'])],
+        'maux_tete': [int(patient['maux_tete'])],
+        'region_encoded': [region_enc]
+    }
+    X_new = pd.DataFrame(features_dict)[feature_cols]
+
+    diagnostic = model_loaded.predict(X_new)[0]
+    probas = model_loaded.predict_proba(X_new)[0]
+    proba_max = probas.max()
+
+    print(f"Patient : {patient['sexe']}, {patient['age']} ans | Temp: {patient['temperature']}°C")
+    print(f"  → Diagnostic : {diagnostic.upper()} ({proba_max:.1%})")
+    for classe, proba in zip(model_loaded.classes_, probas):
+        bar = '█' * int(proba * 30)
+        print(f"    {classe:10s} : {proba:.1%} {bar}")
+    print()
+
+
+# --- Patients avec des régions VALIDES (à adapter selon votre print) ---
+patient_1 = {
+    'age': 20, 'sexe': 'M', 'temperature': 37.0,
+    'tension_sys': 120, 'toux': False, 'fatigue': False,
+    'maux_tete': False, 'region': 'Dakar'          # ✅ sûrement valide
+}
+
+patient_2 = {
+    'age': 35, 'sexe': 'F', 'temperature': 40.2,
+    'tension_sys': 115, 'toux': False, 'fatigue': True,
+    'maux_tete': True, 'region': 'Dakar'           # ← remplacer après avoir vu les régions
+}
+
+patient_3 = {
+    'age': 72, 'sexe': 'M', 'temperature': 38.5,
+    'tension_sys': 140, 'toux': True, 'fatigue': True,
+    'maux_tete': False, 'region': 'Dakar'          # ← remplacer après avoir vu les régions
+}
+
+print("=" * 50)
+predire_diagnostic(patient_1)
+predire_diagnostic(patient_2)
+predire_diagnostic(patient_3)
